@@ -1,0 +1,24 @@
+{
+    "markers": [
+        {
+            "text": "add marker",
+            "comment": "marker"
+        },
+        {
+            "text": "Death",
+            "comment": "death"
+        },
+        {
+            "text": "Game Over",
+            "comment": "Game Over"
+        },
+        {
+            "text": "Important Item",
+            "comment": "WOTH Item"
+        },
+        {
+            "text": "Junk Item",
+            "comment": "Junk Item"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+export declare const TIME_LINE_SCHEMA = "Timeline.1";
+export declare const STACK_SCHEMA = "Stack.1";
+export declare const MARKER_SCHEMA = "Marker.2";
+export declare const MARKED_RANGE_SCHEMA = "TimeRange.1";
+export declare const TRACK_SCHEMA = "Track.1";
+export declare const CLIP_SCHEMA = "Clip.2";
+export declare const VIDEO_TRACK = "Video";
+export declare const AUDIO_TRACK = "Audio";
+export type color_t = string | null;
+//# sourceMappingURL=constants.d.mts.map

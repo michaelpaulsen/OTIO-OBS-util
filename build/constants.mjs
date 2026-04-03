@@ -1,0 +1,9 @@
+export const TIME_LINE_SCHEMA = "Timeline.1";
+export const STACK_SCHEMA = "Stack.1";
+export const MARKER_SCHEMA = "Marker.2";
+export const MARKED_RANGE_SCHEMA = "TimeRange.1";
+export const TRACK_SCHEMA = "Track.1";
+export const CLIP_SCHEMA = "Clip.2";
+export const VIDEO_TRACK = "Video";
+export const AUDIO_TRACK = "Audio";
+//# sourceMappingURL=constants.mjs.map

@@ -1,0 +1,204 @@
+<!--
+    OTIO-OBS-util 
+    Copyright (C) 2026  Michael "Skeleton_craft" Paulsen
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+
+
+-->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://code.jquery.com/jquery-4.0.0.min.js"
+        integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao=" crossorigin="anonymous"></script>
+    <title> test </title>
+    <style>
+        body {
+
+            background-color: #181819;
+            color: #fefefe;
+        }
+
+        button {
+            display: inline-block;
+            background-color: #1a2b68;
+            color: #fefefe;
+            border: none;
+            border-radius: 16%;
+            margin:.5%;
+        }
+
+        .error {
+            text-decoration: underline;
+            text-decoration-color: #a00;
+        }
+
+        a:visited,
+        a {
+            color: #af0;
+        }
+
+        .error h3 {
+            color: #a00;
+            font-weight: bolder;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="buttons">
+
+        <button onclick="save()" accesskey="s"> <u>s</u>ave to file</button>
+        <button onclick="LF()">Show Load Form</button>
+    </div>
+    <div id="output">
+
+    </div>
+    <div id="load_settings" hidden>
+        <input type="file" name="file" id="load_file" title="load_file">
+        <button onclick="load(this)">Load File</button>
+        <div class="error">
+
+        </div>
+    </div>
+    <div id="note"></div>
+    <script>
+        let marker_name_attr = "data-marker_name";
+        let accesskeys = ['s'];
+        let $out = $("#output");
+        $.ajax({
+            url: "buttons.json",
+            success: (data) => {
+                console.log();
+                for (let marker of data.markers) {
+                    let button = $("<button>");
+                    button.attr("onclick", "addMarker(this)");
+                    let txt = '';
+                    button.attr(marker_name_attr, marker.comment);
+                    let accesskey = null;
+
+                    for (let c of marker.text) {
+                        if (!accesskeys.includes(c) && accesskey == null) {
+                            accesskey = c;
+                            accesskeys.push(c);
+                            txt += `<u>${c}</u>`;
+                            continue;
+                        }
+                        txt += c;
+                    }
+                    if (accesskey) {
+                        button.attr("accesskey", accesskey);
+                    }
+                    button.html(txt);
+                    $("#buttons").before(button);
+                    console.log(marker);
+                }
+            }
+        })
+        function LF(el) {
+            $("#load_settings").toggle();
+        }
+        function load(el) {
+            let $this = $(el.parentElement);
+            let $pathEl = $($this.children()[0]);
+            let $errEl = $($this.children(".error"));
+            let file = $pathEl.val().split(/[\\\/]/gm).at(-1);
+            if (!file.includes(".")) {
+                $errEl.html(`<p>[Error] selected file has no extension must have exstension of otio (case insensitive) </p>`);
+                return;
+            }
+            let ext = file.split(".", 2).at(-1).toLowerCase();
+            if (ext != "otio") {
+                $errEl.html(`<p>[Error] invalid extention got ${ext} expected otio </p>`);
+                return;
+            }
+            if (!confirm("are you shure that you want to load?\n doing so will erease your current data!")) {
+                return;
+            }
+            $.ajax({
+                url: `/load?file=${file}`,
+                success: (data) => {
+                    $out.html(data.message);
+
+                    //console.log(data); 
+                },
+                error: (data) => {
+                    console.log(data);
+                }
+            });
+        }
+        function addMarker(e) {
+            let comment = e.dataset.smarker_name;
+            console.log("e.datset ", e.dataset); 
+            console.log(comment);
+            jQuery.ajax({
+                url: `/add/marker?comment=${comment}`,
+                success: (data) => {
+                    $out.html(data.message);
+                },
+                error: (d) => {
+                    let data = d.responseJSON
+                    console.log(data);
+                    $out.html(`<div class ="error">${data.message}</div> `);
+
+                }
+            })
+        }
+        function save() {
+            jQuery.ajax({
+                url: "/save",
+                success: (data) => {
+                    $out.html(JSON.stringify(data));
+                },
+                error: (data) => {
+                    console.log(data.responseJSON);
+                    $out.html(data.responseJSON.error);
+                }
+            })
+        }
+        function keybord(string) { 
+            return `<kbd>${string}</kbd>`;  
+        }
+        function build_key_bind(keys){ 
+            if(!Array.isArray(keys)){ 
+                return keys; 
+            }
+            let arr = []; 
+            keys.forEach((e)=>{
+                arr.push(keybord(e)); 
+            });
+            arr.push(keybord("Key")); 
+            return arr.join("+"); 
+        }
+        let $nEl = $("#note"); 
+        if(navigator.userAgent.includes("Firefox")){ 
+            $nEl.append(`
+<p>you seem to be using FireFox</p> 
+<p>to activate hot keys do ${build_key_bind(["Shift","Alt"])}</p>
+            `); 
+        }
+        if(navigator.userAgent.includes("Chrome")){
+            $nEl.append(`
+<p>you seem to be using Chrome</p> 
+<p>to activate hot keys do ${build_key_bind(["Alt"])}</p>
+            `);
+        }
+    </script>
+</body>
+
+</html>
